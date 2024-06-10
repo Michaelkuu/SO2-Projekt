@@ -42,6 +42,22 @@ Gra została stworzona przy użyciu języka Python, biblioteki Pygame oraz wątk
 
 - **Typ**: Standardowy wątek z Pythona (threading.Thread).
 
+#### 3. Wątek Zarządzania Życiem `LifeManager`
+- **Reprezentacja**: Odpowiada za monitorowanie i aktualizację liczby życia gracza. Reaguje na zmiany w grze, które wpływają na życie, takie jak dotarcie przeciwników do bazy.
+
+- **Inicjacja**: Uruchamiany na początku gry, pracuje w tle monitorując i aktualizując życia.
+
+- **Zależności i synchronizacja**:
+  - Wykorzystuje `lives_lock` do bezpiecznej zmiany stanu życia.
+  - Słucha `game_over_event`, aby zakończyć działanie po zakończeniu gry.
+
+- **Metody**:
+  - `decrease_lives(amount)`: Zmniejsza liczbę życia gracza.
+  - `get_lives()`: Zwraca aktualną liczbę życia.
+  - `stop()`: Bezpiecznie zatrzymuje wątek po zakończeniu rozgrywki.
+  
+- **Typ**: Standardowy wątek z Pythona (`threading.Thread`).
+
 ### Sekcje Krytyczne:
 #### 1. Modyfikacja listy przeciwników
 - **Opis**: W funkcji `spawn_enemies`, przeciwnicy są tworzeni i dodawani do listy `enemies`. Wątek odpowiedzialny za generowanie przeciwników musi uzyskać blokadę (enemies_lock) przed modyfikacją listy, aby zapewnić, że żaden inny wątek (np. główny wątek gry podczas aktualizacji stanu przeciwników) nie będzie modyfikować listy jednocześnie.
