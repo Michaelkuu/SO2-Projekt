@@ -1,38 +1,56 @@
-# Gra Tower Defense
+# Systemy Operacyjne 2 Projekt
 
-## Przegląd
-Niniejszy dokument dostarcza informacji na temat podejścia do wielowątkowości oraz zarządzania sekcjami krytycznymi w naszej grze typu Tower Defense. Gra wykorzystuje wiele wątków do zarządzania generowaniem przeciwników, stanem gry oraz muzyką w tle, co zapewnia płynną i responsywną rozgrywkę.
+## Wydział Informatyki i Telekomunikacji
 
-## Wątki
-### 1. Wątek generowania przeciwników (`SpawnEnemy`)
-- **Cel**: Zarządza ciągłym tworzeniem i dodawaniem przeciwników zdefiniowanych w kolejnych falach. Przeciwnicy są generowani w określonych interwałach dla każdej fali i dodawani do współdzielonej listy `enemies`.
-- **Inicjacja**: Uruchamiany przez `spawn_event` za każdym razem, gdy rozpoczyna się nowa fala przeciwników. Wątek jest tworzony i uruchamiany z funkcji `spawn_enemies`.
-- **Zależności i synchronizacja**:
-  - Wykorzystuje `enemies_lock` do synchronizacji dostępu do listy przeciwników, zapobiegając konfliktom i błędom związanym z jednoczesnymi modyfikacjami przez różne wątki.
-  - Monitoruje `game_over_flag` oraz `stop_event`, aby ustalić, czy gra się zakończyła lub czy wątek powinien zostać zakończony przed rozpoczęciem nowej fali.
-- **Typ**: Standardowy wątek z Pythona (`threading.Thread`).
+### Autorzy:
+- Michał Kucharek - 264169
+- Michał Ćwirko - 269178
 
-### 2. Wątek muzyki (`MusicThread`)
-- **Cel**: Zarządza odtwarzaniem muzyki w tle podczas gry.
-- **Inicjacja**: Uruchamiany raz na początku gry, aby zapętlić muzykę w tle.
-- **Zależności i synchronizacja**:
-  - Działa niezależnie od innych wątków, jako że zarządzanie muzyką nie wpływa bezpośrednio na mechanikę gry i jest odseparowane od głównego przepływu logiki.
-  - Nie wykorzystuje żadnych mechanizmów synchronizacji z innymi wątkami, ponieważ jego zadania są izolowane.
-- **Typ**: Standardowy wątek z Pythona (`threading.Thread`).
+### Prowadzący:
+dr inż. Tomasz Szandała
 
-## Sekcje Krytyczne
-### Modyfikacja listy przeciwników
-- **Opis**: Przeciwnicy są tworzeni i dodawani do listy `enemies` w funkcji `spawn_enemies`. Wątek odpowiedzialny za generowanie przeciwników musi uzyskać blokadę `enemies_lock` przed modyfikacją listy, aby zapewnić, że żaden inny wątek (np. główny wątek gry) nie modyfikuje listy jednocześnie.
-- **Typ Blokady**: Mutex (`threading.Lock`).
+---
 
-### Przeglądanie i modyfikacja listy przeciwników
-- **Opis**: Główny wątek gry przegląda i aktualizuje stan przeciwników, rysując ich i potencjalnie usuwając z listy. Ta operacja również wymaga użycia `enemies_lock` do synchronizacji dostępu.
-- **Typ Blokady**: Mutex (`threading.Lock`).
+## Tower Defense
 
-## Flagi synchronizacyjne
-- **Flaga `spawn_event`**: Kontroluje kiedy nowi przeciwnicy powinni być generowani. Wątek generujący przeciwników czeka na to zdarzenie, aby rozpocząć generowanie nowej fali przeciwników, i ustawia je na zakończenie fali, informując główny wątek gry o możliwości rozpoczęcia nowej fali.
-- **Flaga `game_over_flag`**: Ustawiana, gdy gra się kończy (np. gracz przegrywa wszystkie życia). Ta flaga jest sprawdzana przez różne wątki, aby zdecydować, czy kontynuować działanie, czy zakończyć i oczyścić zasoby.
-- **Typ**: Zdarzenia (`threading.Event`).
+Gra została stworzona przy użyciu języka Python, biblioteki Pygame oraz wątków. Celem gry jest ochrona swojej bazy przed wrogami, budując wieże obronne. Wrogowie pojawiają się co pewien czas falami i poruszają się po wyznaczonej ścieżce. Gracz zdobywa pieniądze za pokonywanie wrogów, które może przeznaczyć na budowę dodatkowych wież. Gra oferuje prostą, ale wciągającą mechanikę, która wymaga szybkiego myślenia i skutecznej strategii.
 
-## Podsumowanie
-Podejście do wielowątkowości w naszej grze Tower Defense zapewnia dynamiczną rozgrywkę i responsywną mechanikę gry. Odpowiednie zarządzanie sekcjami krytycznymi oraz mechanizmami synchronizacji jest kluczowe dla utrzymania stabilności i wydajności gry.
+### Wątki:
+#### Wątek “SpawnEnemy”
+**Reprezentacja**: Wątek ten jest odpowiedzialny za ciągłe tworzenie przeciwników zdefiniowanych w falach. Przeciwnicy są generowani w interwałach określonych dla każdej fali i są dodawani do listy “enemies”, którą wykorzystuje główny wątek gry do zarządzania interakcjami i logiką przeciwników.
+
+**Inicjacja**: Wątek jest uruchamiany za każdym razem, gdy rozpoczyna się nowa fala przeciwników, co jest kontrolowane przez “spawn_event”. Nowy wątek jest tworzony i startowany z funkcji “spawn_enemies”.
+
+**Zależności i synchronizacja**:
+- Używa “enemies_lock” do synchronizacji dostępu do listy przeciwników, co zapobiega konfliktom i błędom związanym z jednoczesnym modyfikowaniem tej listy przez różne wątki.
+- Odczytuje flagę “game_over_flag” oraz “stop_event”, aby sprawdzić, czy gra została zakończona lub czy wątek powinien zakończyć działanie przed rozpoczęciem nowej fali.
+
+**Typ**: Standardowy wątek z Pythona (threading.Thread).
+
+#### Wątek “MusicThread”
+**Reprezentacja**: Odpowiada za odtwarzanie muzyki w tle gry.
+
+**Inicjacja**: Jest uruchamiany raz podczas startu gry, aby zapętlić odtwarzanie ścieżki dźwiękowej.
+
+**Zależności i synchronizacja**:
+- Operuje niezależnie od innych wątków, ponieważ zarządzanie muzyką nie wpływa bezpośrednio na mechanikę gry i jest odseparowane od głównego przepływu logiki.
+- Nie używa żadnych mechanizmów synchronizacji z innymi wątkami, ponieważ jego zadania są izolowane.
+
+**Typ**: Standardowy wątek z Pythona (threading.Thread).
+
+### Sekcje Krytyczne:
+#### Modyfikacja listy przeciwników
+**Opis**: W funkcji “spawn_enemies”, przeciwnicy są tworzeni i dodawani do listy “enemies”. Wątek odpowiedzialny za generowanie przeciwników musi uzyskać blokadę (enemies_lock) przed modyfikacją listy, aby zapewnić, że żaden inny wątek (np. główny wątek gry podczas aktualizacji stanu przeciwników) nie będzie modyfikować listy jednocześnie.
+
+**Typ Blokady**: Mutex (threading.Lock).
+
+#### Przeglądanie i modyfikacja listy przeciwników
+**Opis**: W głównym wątku gry, podczas rysowania i aktualizacji stanu przeciwników, lista “enemies” jest iterowana, a przeciwnicy są aktualizowani, rysowani lub usuwani. Ta operacja również wymaga blokady, ponieważ w innym przypadku mogą wystąpić konflikty z wątkiem generującym przeciwników.
+
+**Typ Blokady**: Mutex (threading.Lock).
+
+### Flagi synchronizacyjne:
+- **Flaga “spawn_event”**: Kontroluje, kiedy nowi przeciwnicy powinni być generowani. Wątek generujący przeciwników czeka na to zdarzenie, aby rozpocząć generowanie nowej fali przeciwników i ustawia je na zakończenie fali, informując główny wątek gry o możliwości rozpoczęcia nowej fali.
+- **Flaga “game_over_flag”**: Jest ustawiana, gdy gra się kończy (np. gracz przegrał wszystkie życia). Ta flaga jest sprawdzana przez różne wątki, aby zdecydować, czy kontynuować działanie, czy zakończyć i oczyścić zasoby.
+
+**Typ**: Zdarzenia (threading.Event).
