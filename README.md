@@ -15,6 +15,10 @@ dr inż. Tomasz Szandała
 
 Gra została stworzona przy użyciu języka Python, biblioteki Pygame oraz wątków. Celem gry jest ochrona swojej bazy przed wrogami, budując wieże obronne. Wrogowie pojawiają się co pewien czas falami i poruszają się po wyznaczonej ścieżce. Gracz zdobywa pieniądze za pokonywanie wrogów, które może przeznaczyć na budowę dodatkowych wież. Gra oferuje prostą, ale wciągającą mechanikę, która wymaga szybkiego myślenia i skutecznej strategii.
 
+### Zrzut ekranu z gry
+![image](https://github.com/Michaelkuu/SO2-Projekt/assets/85109674/1f880c1d-a849-4d1e-8346-023b456516ad)
+
+
 ### Wątki:
 #### 1. Wątek `SpawnEnemy`
 - **Reprezentacja**: Wątek ten jest odpowiedzialny za ciągłe tworzenie przeciwników zdefiniowanych w falach. Przeciwnicy są generowani w interwałach określonych dla każdej fali i są dodawani do listy `enemies`, którą wykorzystuje główny wątek gry do zarządzania interakcjami i logiką przeciwników.
