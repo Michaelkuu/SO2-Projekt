@@ -38,7 +38,6 @@ Gra została stworzona przy użyciu języka Python, biblioteki Pygame oraz wątk
 
 **Typ**: Standardowy wątek z Pythona (threading.Thread).
 
-
 ### Sekcje Krytyczne:
 #### 1. Modyfikacja listy przeciwników
 **Opis**: W funkcji “spawn_enemies”, przeciwnicy są tworzeni i dodawani do listy “enemies”. Wątek odpowiedzialny za generowanie przeciwników musi uzyskać blokadę (enemies_lock) przed modyfikacją listy, aby zapewnić, że żaden inny wątek (np. główny wątek gry podczas aktualizacji stanu przeciwników) nie będzie modyfikować listy jednocześnie.
@@ -50,7 +49,7 @@ Gra została stworzona przy użyciu języka Python, biblioteki Pygame oraz wątk
 
 **Typ Blokady**: Mutex (threading.Lock).
 
-### 3. Flagi synchronizacyjne:
+#### 3. Flagi synchronizacyjne:
 - **Flaga “spawn_event”**: Kontroluje, kiedy nowi przeciwnicy powinni być generowani. Wątek generujący przeciwników czeka na to zdarzenie, aby rozpocząć generowanie nowej fali przeciwników i ustawia je na zakończenie fali, informując główny wątek gry o możliwości rozpoczęcia nowej fali.
 - **Flaga “game_over_flag”**: Jest ustawiana, gdy gra się kończy (np. gracz przegrał wszystkie życia). Ta flaga jest sprawdzana przez różne wątki, aby zdecydować, czy kontynuować działanie, czy zakończyć i oczyścić zasoby.
 
